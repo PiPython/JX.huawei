@@ -40,12 +40,19 @@
 
 ### 2.4 语义示意图
 
-这条数据流可以直接顺着看：
+把它画成一条最短的数据流，大概就是下面这样：
 
-- 逐 lane 比较结果，通常是 `FF / 00 / FF / ...`
-- 每个 lane 保留一位逻辑含义
-- 压成一个标量 mask
-- 再交给分支判断、`popcount / ctz`、selection vector（命中位置数组）生成，或者压缩写回
+```mermaid
+flowchart LR
+    A["逐 lane 比较结果<br/>FF / 00 / FF / ..."] --> B["每个 lane 保留 1 bit 逻辑含义"]
+    B --> C["to_bitmask<br/>生成标量 mask"]
+    C --> D["分支判断<br/>mask == 0 ?"]
+    C --> E["位操作<br/>popcount / ctz"]
+    C --> F["selection vector<br/>命中位置数组"]
+    C --> G["压缩写回<br/>selected data"]
+```
+
+如果只看本文关心的边界，`to_bitmask` 处理的就是中间这一步：**把一批 lane 的真假结果，交成后续控制逻辑能直接消费的标量 mask。**
 
 ## 3. 它通常出现在哪里
 
