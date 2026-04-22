@@ -42,15 +42,7 @@
 
 把它画成一条最短的数据流，大概就是下面这样：
 
-```mermaid
-flowchart LR
-    A["逐 lane 比较结果<br/>FF / 00 / FF / ..."] --> B["每个 lane 保留 1 bit 逻辑含义"]
-    B --> C["to_bitmask<br/>生成标量 mask"]
-    C --> D["分支判断<br/>mask == 0 ?"]
-    C --> E["位操作<br/>popcount / ctz"]
-    C --> F["selection vector<br/>命中位置数组"]
-    C --> G["压缩写回<br/>selected data"]
-```
+![to_bitmask 语义示意图](images/to_bitmask_flow.svg)
 
 如果只看本文关心的边界，`to_bitmask` 处理的就是中间这一步：**把一批 lane 的真假结果，交成后续控制逻辑能直接消费的标量 mask。**
 
@@ -763,17 +755,7 @@ BRKA      p6.b, p0/z, p2.b         ; 生成 break-after 语义
 
 如果把这个决策过程画出来，主线其实很短：
 
-```mermaid
-flowchart TD
-    A["compare / classify<br/>先生成 predicate"] --> B{"是否必须交出<br/>标量 mask?"}
-    B -- "是" --> C["to_scalar_mask(pred)<br/>走边界适配路径"]
-    B -- "否" --> D{"结果接下来怎么消费?"}
-    D --> E["any / all / count<br/>svptest_any / svcntp"]
-    D --> F["first hit<br/>svpfirst / svbrkb + svcntp"]
-    D --> G["all hit positions<br/>svpfirst / svpnext"]
-    D --> H["selected data<br/>pfirst/pnext 或 byte compact"]
-    D --> I["predicate algebra<br/>继续留在 predicate 域"]
-```
+![to_bitmask 消费侧决策图](images/to_bitmask_decision_flow.svg)
 
 这条决策链按顺序看就够了：
 

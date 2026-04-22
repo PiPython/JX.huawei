@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="600" viewBox="0 0 1100 600" role="img" aria-labelledby="title desc">
+  <title id="title">to_bitmask data flow</title>
+  <desc id="desc">Lane-wise compare results keep one bit of meaning per lane, are converted into a scalar mask, and are then consumed by branching, bit operations, selection-vector generation, or selected-data writeback.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2f3b52"/>
+    </marker>
+    <style>
+      .bg { fill: #f7f8fb; }
+      .box { fill: #ffffff; stroke: #2f3b52; stroke-width: 2; rx: 14; ry: 14; }
+      .main { fill: #eaf1ff; }
+      .panel { fill: #f3f6fb; stroke: #2f3b52; stroke-width: 2; rx: 16; ry: 16; }
+      .card { fill: #ffffff; stroke: #5b6985; stroke-width: 1.8; rx: 12; ry: 12; }
+      .line { stroke: #2f3b52; stroke-width: 2.6; fill: none; marker-end: url(#arrow); }
+      .label { font: 600 22px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; fill: #1f2937; text-anchor: middle; }
+      .small { font: 500 18px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; fill: #364152; text-anchor: middle; }
+      .panel-title { font: 700 22px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; fill: #1f2937; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1100" height="600"/>
+
+  <rect class="box" x="40" y="70" width="260" height="108"/>
+  <text class="label" x="170" y="108">逐 lane 比较结果</text>
+  <text class="small" x="170" y="142">FF / 00 / FF / ...</text>
+
+  <rect class="box" x="420" y="70" width="260" height="108"/>
+  <text class="label" x="550" y="108">每个 lane</text>
+  <text class="small" x="550" y="142">保留 1 bit 逻辑含义</text>
+
+  <rect class="box main" x="800" y="70" width="260" height="108"/>
+  <text class="label" x="930" y="108">to_bitmask</text>
+  <text class="small" x="930" y="142">生成标量 mask</text>
+
+  <path class="line" d="M300 124 H420"/>
+  <path class="line" d="M680 124 H800"/>
+
+  <rect class="panel" x="60" y="255" width="980" height="285"/>
+  <text class="panel-title" x="90" y="292">典型消费方式</text>
+
+  <path class="line" d="M930 178 V225 H550 V255"/>
+
+  <rect class="card" x="100" y="325" width="400" height="78"/>
+  <text class="small" x="300" y="356">分支判断</text>
+  <text class="small" x="300" y="382">mask == 0 ?</text>
+
+  <rect class="card" x="600" y="325" width="400" height="78"/>
+  <text class="small" x="800" y="356">位操作</text>
+  <text class="small" x="800" y="382">popcount / ctz</text>
+
+  <rect class="card" x="100" y="430" width="400" height="78"/>
+  <text class="small" x="300" y="461">selection vector</text>
+  <text class="small" x="300" y="487">命中位置数组</text>
+
+  <rect class="card" x="600" y="430" width="400" height="78"/>
+  <text class="small" x="800" y="461">压缩写回</text>
+  <text class="small" x="800" y="487">selected data</text>
+</svg>
