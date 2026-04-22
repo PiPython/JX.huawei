@@ -761,6 +761,20 @@ BRKA      p6.b, p0/z, p2.b         ; 生成 break-after 语义
 
 这里最关键的不是函数名，而是边界。前七项都应该尽量停留在 predicate 或 compacted-data 域；`to_scalar_mask(pred)` 只是兼容层入口，不该成为默认主流程。
 
+如果把这个决策过程画出来，主线其实很短：
+
+```mermaid
+flowchart TD
+    A["compare / classify<br/>先生成 predicate"] --> B{"是否必须交出<br/>标量 mask?"}
+    B -- "是" --> C["to_scalar_mask(pred)<br/>走边界适配路径"]
+    B -- "否" --> D{"结果接下来怎么消费?"}
+    D --> E["any / all / count<br/>svptest_any / svcntp"]
+    D --> F["first hit<br/>svpfirst / svbrkb + svcntp"]
+    D --> G["all hit positions<br/>svpfirst / svpnext"]
+    D --> H["selected data<br/>pfirst/pnext 或 byte compact"]
+    D --> I["predicate algebra<br/>继续留在 predicate 域"]
+```
+
 这条决策链按顺序看就够了：
 
 1. `compare / classify` 先生成 predicate。
